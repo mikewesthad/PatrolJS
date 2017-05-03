@@ -9,16 +9,21 @@
 
 	var _, THREE, ProgressBar;
 
+	// Look for require support and fallback to window.globals in browser
 	if (typeof module !== 'undefined' && module.exports) {
 		_ = require('underscore');
 		THREE = require('three');
-		ProgressBar = require('progress');
 	}
 	else {
 		_ = window._;
 		THREE = window.THREE;
+	}
 
-		// stub in the browser
+	// Load ProgressBar when in node, but create a dummy if working in the browser
+	if (typeof window === 'undefined') {
+		ProgressBar = require('progress');
+	} else {
+		// Stub in the browser
 		ProgressBar = function () {
 			return {
 				tick: function () {}
