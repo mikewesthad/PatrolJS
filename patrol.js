@@ -1108,7 +1108,7 @@
 
 			var closestNodeGroup = null;
 
-			var distance = Math.pow(50, 2);
+			var distance = Number.MAX_VALUE;
 
 			_.each(zoneNodes[zone].groups, function (group, index) {
 				_.each(group, function (node) {
@@ -1151,7 +1151,7 @@
 			var vertices = zoneNodes[zone].vertices;
 
 			var closestNode = null;
-			var distance = Math.pow(50, 2);
+			var distance = Number.MAX_VALUE;
 
 			_.each(allNodes, function (node) {
 				var measuredDistance = distanceToSquared(node.centroid, startPosition);
@@ -1163,7 +1163,7 @@
 
 
 			var farthestNode = null;
-			distance = Math.pow(50, 2);
+			distance = Number.MAX_VALUE;
 
 			_.each(allNodes, function (node) {
 				var measuredDistance = distanceToSquared(node.centroid, targetPosition);
