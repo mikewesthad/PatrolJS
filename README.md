@@ -48,6 +48,8 @@ jsonLoader.load( 'meshes/level.nav.js', function( geometry, materials ) {
 
 First, you need to build nodes from the navigation mesh using `buildNodes(geometry)`. These nodes are then saved in memory by passing them to PatrolJS using `setZoneData(levelName, nodes)`.
 
+`buildNodes(...)` takes an optional second parameter `maxNeighbourDistance` which defaults to a value of 100. This is a performance optimization for avoiding connecting navmesh faces that are far away from each other. When working with large meshes, it may be necessary to remove this optimization by passing in -1 for the `maxNeighbourDistance`.
+
 Every navigation mesh consists out of many groups of polygons. This is because, you can't always calculate a path from everywhere to everywhere. A path can only be constructed between points that lie on one group of polygons.
 
 A level may only contain one group of polygons, but in practice these are usually more. The demo scene has around 50 groups for example. This is because Blender tries to bake the top surfaces of obstacles like crates and other inaccessible areas as well. You may remove these areas yourself for an optimization, if you wish, before converting the file to JSON for use with PatrolJS.
