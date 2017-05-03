@@ -369,7 +369,7 @@
 		return ret;
 	}
 
-	var buildPolygonNeighbours = function (polygon, navigationMesh) {
+	var buildPolygonNeighbours = function (polygon, navigationMesh, maxNeighbourDistance) {
 		polygon.neighbours = [];
 
 		// All other nodes that contain at least two of our vertices are our neighbours
@@ -377,8 +377,11 @@
 			if (polygon === navigationMesh.polygons[i]) continue;
 
 			// Don't check polygons that are too far, since the intersection tests take a long time
-			if (polygon.centroid.distanceToSquared(navigationMesh.polygons[i].centroid) > 100 * 100) continue;
-
+			if (maxNeighbourDistance !== -1) {
+				var d = polygon.centroid.distanceToSquared(navigationMesh.polygons[i].centroid);
+				if (d > maxNeighbourDistance * maxNeighbourDistance) continue;
+			}
+			
 			var matches = array_intersect(polygon.vertexIds, navigationMesh.polygons[i].vertexIds);
 			// var matches = _.intersection(polygon.vertexIds, navigationMesh.polygons[i].vertexIds);
 
@@ -388,7 +391,7 @@
 		}
 	};
 
-	var buildPolygonsFromGeometry = function (geometry) {
+	var buildPolygonsFromGeometry = function (geometry, maxNeighbourDistance) {
 
 		console.log("Vertices:", geometry.vertices.length, "polygons:", geometry.faces.length);
 
@@ -425,7 +428,7 @@
 		// Build a list of adjacent polygons
 		_.each(polygons, function (polygon) {
 			bar.tick();
-			buildPolygonNeighbours(polygon, navigationMesh);
+			buildPolygonNeighbours(polygon, navigationMesh, maxNeighbourDistance);
 		});
 
 		return navigationMesh;
@@ -563,7 +566,7 @@
 
 	};
 
-	var buildNavigationMesh = function (geometry) {
+	var buildNavigationMesh = function (geometry, maxNeighbourDistance) {
 
 		// Prepare geometry
 		computeCentroids(geometry);
@@ -572,7 +575,7 @@
 
 		// console.log("vertices:", geometry.vertices.length, "polygons:", geometry.faces.length);
 
-		var navigationMesh = buildPolygonsFromGeometry(geometry);
+		var navigationMesh = buildPolygonsFromGeometry(geometry, maxNeighbourDistance);
 
 		// cleanNavigationMesh(navigationMesh);
 		// console.log("Pre-clean:", navigationMesh.polygons.length, "polygons,", navigationMesh.vertices.length, "vertices.");
@@ -1088,8 +1091,9 @@
 	var path = null;
 
 	_.extend(exports, {
-		buildNodes: function (geometry) {
-			var navigationMesh = buildNavigationMesh(geometry);
+		buildNodes: function (geometry, maxNeighbourDistance) {
+			if (maxNeighbourDistance === undefined) maxNeighbourDistance = 100;
+			var navigationMesh = buildNavigationMesh(geometry, maxNeighbourDistance);
 
 			var zoneNodes = groupNavMesh(navigationMesh);
 
